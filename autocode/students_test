@@ -2,6 +2,8 @@ package coverage
 
 import (
 	"os"
+	"testing"
+	"time"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -18,3 +20,120 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
+func TestLen(t *testing.T) {
+	want := 10
+	p := make(People, want)
+	got := p.Len()
+	if got != want {
+		t.Errorf("Got %d people but want %d", got, want)
+	}
+
+	want2 := 0
+	p2 := make(People, want2)
+	got2 := p2.Len()
+	if got2 != want2 {
+		t.Errorf("Got %d people but want %d", got2, want2)
+	}
+}
+
+func TestPeople_Less(t *testing.T) {
+	t1 := time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
+	t2 := time.Date(0, 0, 1, 0, 0, 0, 0, time.UTC)
+	n1 := "A"
+	s1 := "A"
+	n2 := "A"
+	s2 := "A"
+
+	people := make(People, 2)
+	people[0] = Person{n1, s1, t1}
+	people[1] = Person{n2, s2, t2}
+
+	var want bool = false
+	var got bool = people.Less(0, 1)
+	// same  birthday
+	if want != got {
+		t.Errorf("Testing Less with different birthdays: Wanted %t but got %t", want, got)
+	}
+	people[0].firstName = "B"
+	people[1].birthDay = time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)
+	got = people.Less(0, 1)
+	// same name
+	if want != got {
+		t.Errorf("Testing Less with different names: Wanted %t but got %t", want, got)
+	}
+
+	people[0].firstName = "A"
+	people[0].lastName = "B"
+	got = people.Less(0, 1)
+	// same surname
+	if want != got {
+		t.Errorf("Testing Less with different last names: Wanted %t but got %t", want, got)
+	}
+
+}
+
+func TestPeople_Swap(t *testing.T) {
+	people := make(People, 2)
+	p1 := Person{"A", "A", time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)}
+	p2 := Person{"B", "B", time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC)}
+	people[0] = p1
+	people[1] = p2
+	people.Swap(0, 1)
+	if people[0].firstName != "B" {
+		t.Errorf("Swap failed")
+	}
+}
+
+func TestMatrix_Rows(t *testing.T) {
+	matr_dims := "1 2"
+	matrix, _ := New(matr_dims)
+	rows := matrix.Rows()
+	if rows[0][0] != 1 {
+		t.Errorf("Wrong rows")
+	}
+}
+
+func TestNew(t *testing.T) {
+	var matr_dim string = "1 2"
+	_, err := New(matr_dim)
+	if err != nil {
+		t.Errorf("Normal input but func throw an error")
+	}
+	matr_dim = "1 2 \n 3 4 5"
+	_, err = New(matr_dim)
+	if err == nil {
+		t.Errorf("Wrong cols input but no error")
+	}
+	matr_dim = "1 /"
+	_, err = New(matr_dim)
+	if err == nil {
+		t.Errorf("Wrong symbol but no error")
+	}
+
+}
+
+func TestMatrix_Cols(t *testing.T) {
+	matr_dims := "1 2 \n 3 4"
+	matrix, _ := New(matr_dims)
+	cols := matrix.Cols()
+	if cols[1][1] != 4 {
+		t.Errorf("Wrong rows")
+	}
+}
+
+func TestMatrix_Set(t *testing.T) {
+	matr_dims := "1 2"
+	matrix, _ := New(matr_dims)
+	var assign bool = matrix.Set(0, 0, 1)
+	if !assign {
+		t.Errorf("Allocation failed")
+	}
+	assign = matrix.Set(-1, 0, 1)
+	if assign {
+		t.Errorf("Didn't catch negative value in rows")
+	}
+	assign = matrix.Set(0, -1, 1)
+	if assign {
+		t.Errorf("Didn't catch negative value in cols")
+	}
+}
